@@ -1,0 +1,30 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="peer/PeerToPeer.cs">
+    <Files>
+      <File FileName="peer/Program.cs" Line="1" Column="1" />
+      <File FileName="peer/server.cs" Line="1" Column="1" />
+      <File FileName="peer/client.cs" Line="197" Column="3" />
+      <File FileName="peer/PeerToPeer.cs" Line="2" Column="7" />
+      <File FileName="peer/getFile.cs" Line="1" Column="1" />
+      <File FileName="peer/message.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/erik/csci5211/peer/peer/Program.cs" line="133" column="1" />
+      <Breakpoint file="/home/erik/csci5211/peer/peer/server.cs" line="334" column="1" />
+      <Breakpoint file="/home/erik/csci5211/peer/peer/PeerToPeer.cs" line="159" column="1" />
+      <Breakpoint file="/home/erik/csci5211/peer/peer/PeerToPeer.cs" line="168" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="peer/Program.cs" line="354" offsetX="382" offsetY="6001" expression="addressBytes" liveUpdate="False" />
+    <Watch file="peer/Program.cs" line="359" offsetX="566" offsetY="6086" expression="messageIP" liveUpdate="False" />
+    <Watch file="peer/Program.cs" line="227" offsetX="1014" offsetY="3842" expression="cmdBytes" liveUpdate="False" />
+    <Watch file="peer/server.cs" line="205" offsetX="798" offsetY="3468" expression="buf" liveUpdate="False" />
+    <Watch file="peer/server.cs" line="315" offsetX="398" offsetY="5338" expression="serverQueue" liveUpdate="False" />
+    <Watch file="peer/PeerToPeer.cs" line="123" offsetX="486" offsetY="2074" expression="serverQueue" liveUpdate="False" />
+    <Watch file="peer/PeerToPeer.cs" line="162" offsetX="342" offsetY="2737" expression="msg" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>
