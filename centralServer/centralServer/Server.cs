@@ -21,7 +21,7 @@ namespace CentralServer
         int numConnectedSockets;                        // the total number of clients connected to the server 
         Semaphore maxNumberAcceptedClients;
         public List<peerInstance> peerList;
-		public List<networkLinks> peerConnections;
+		public List<networkLinks> peerConnections = new List<networkLinks>();
 
         public Server(int numConns, int receiveSize)
         {
@@ -253,6 +253,7 @@ namespace CentralServer
 					{
 						Console.WriteLine("Machine at {0} doesn't have a server.  First machine in network.", peerList[newPeerCnt].peerIP);
 						netLink.client = peerList[newPeerCnt].peerIP;
+					   	netLink.server = IPAddress.Parse("0.0.0.0");
 						peerConnections.Add (netLink);
 					    printConnectionTable();
 					}
@@ -317,9 +318,11 @@ namespace CentralServer
 		private void printConnectionTable()
 		{
 			Console.WriteLine("----------------------------------------------------");
+			Console.WriteLine("---------Network looks like-------------------------");
+			Console.WriteLine("----------------------------------------------------");
 			for (int i=0;i<peerConnections.Count;i++)
 			{
-				Console.WriteLine("Server {0} -> Client {1}", peerConnections[i].server, peerConnections[i].client);
+				Console.WriteLine("Server {0}\t->\tClient {1}", peerConnections[i].server, peerConnections[i].client);
 			}
 			Console.WriteLine("----------------------------------------------------\n");
 		}
