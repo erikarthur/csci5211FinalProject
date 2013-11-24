@@ -43,6 +43,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SocketAsyncEventArgsPool.cs" />
+    <Compile Include="networkStructure.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

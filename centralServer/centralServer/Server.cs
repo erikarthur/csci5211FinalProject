@@ -21,6 +21,7 @@ namespace CentralServer
         int numConnectedSockets;                        // the total number of clients connected to the server 
         Semaphore maxNumberAcceptedClients;
         public List<peerInstance> peerList;
+		public List<networkLinks> peerConnections;
 
         public Server(int numConns, int receiveSize)
         {
@@ -246,14 +247,22 @@ namespace CentralServer
                     peerList[newPeerCnt].peerIP = newPeer.peerIP;
                     peerList[newPeerCnt].peerPort = newPeer.peerPort;
 
+					networkLinks netLink = new networkLinks();
                     Console.WriteLine("New p2p machine at {0}.", peerList[newPeerCnt].peerIP);
 					if (peerList.Count == 1)
 					{
 						Console.WriteLine("Machine at {0} doesn't have a server.  First machine in network.", peerList[newPeerCnt].peerIP);
+						netLink.client = peerList[newPeerCnt].peerIP;
+						peerConnections.Add (netLink);
+					    printConnectionTable();
 					}
 					else
 					{
 						Console.WriteLine("Machine at {0}.  Server is {1}.  Port is {2}.",  peerList[newPeerCnt].peerIP, peerList[peerNumber].peerIP, peerList[peerNumber].peerPort);
+						netLink.client = peerList[newPeerCnt].peerIP;
+						netLink.server = peerList[peerNumber].peerIP;
+						peerConnections.Add (netLink);
+						printConnectionTable();
 					}
 					
                     intBytes = BitConverter.GetBytes(16);
@@ -305,6 +314,17 @@ namespace CentralServer
             }
         }
 
+		private void printConnectionTable()
+		{
+			Console.WriteLine("----------------------------------------------------");
+			for (int i=0;i<peerConnections.Count;i++)
+			{
+				Console.WriteLine("Server {0} -> Client {1}", peerConnections[i].server, peerConnections[i].client);
+			}
+			Console.WriteLine("----------------------------------------------------\n");
+		}
+		
+		
         private void ProcessSend(SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success)
