@@ -21,6 +21,6 @@ Global
 		{E775DB54-ABBF-44E6-B42F-AD150CEF98EF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = centralServer\centralServer\centralServer.csproj
+		StartupItem = peer\peer\peer.csproj
 	EndGlobalSection
 EndGlobal
