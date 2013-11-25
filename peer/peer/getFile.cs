@@ -64,7 +64,7 @@ namespace peer
 			fileName = utf8.GetString(fileNameBytes);
 
 			int bytesLeft = (24 + fileNameSize + fileSize);
-            BinaryWriter fs = new BinaryWriter(File.Open(cmd.fileDir + "/" + fileName, FileMode.CreateNew));
+            BinaryWriter fs = new BinaryWriter(File.Open(cmd.fileDir  + fileName, FileMode.CreateNew));
             
             fs.Write(buffer, 24 + fileNameSize, numBytes - (24 + fileNameSize));
 
