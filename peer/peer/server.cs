@@ -201,7 +201,7 @@ namespace socketSrv
         {
             commandMessage returnMsg = new commandMessage();
             byte[] msgLen = new byte[4];
-            byte[] fileNameBytes = new byte[50];
+            byte[] fileNameBytes = new byte[75];
             Int32 bufferCnt = 0;
 
             System.Buffer.BlockCopy(buf, bufferCnt, msgLen, 0, msgLen.Length);
@@ -230,6 +230,15 @@ namespace socketSrv
             {
                 case 2: 
                     //rest of the buffer is the filename to send
+                    byte [] fileNameSizeBytes = new byte[4];
+                    byte [] fileSizeBytes = new byte[4];
+
+                    System.Buffer.BlockCopy(buf, bufferCnt, fileSizeBytes, 0, fileSizeBytes.Length);
+                    bufferCnt += fileSizeBytes.Length;
+                    
+                    System.Buffer.BlockCopy(buf, bufferCnt, fileNameSizeBytes, 0, fileNameSizeBytes.Length);
+                    bufferCnt += fileNameSizeBytes.Length;
+
                     int fileByteCnt = bufBytes - bufferCnt;
                     System.Buffer.BlockCopy(buf, bufferCnt, fileNameBytes, 0, fileByteCnt);
 				
@@ -274,7 +283,7 @@ namespace socketSrv
 
             commandMessage msg = parseCommandMessage(myBuffer, e.BytesTransferred);
 			//this.serverQueue.Enqueue(msg);
-			serverQueue.Add(msg);
+			//serverQueue.Add(msg);
 
             int peerNumber;
             //create peer variable to send back to client
