@@ -539,7 +539,7 @@ namespace socketSrv
 
             fileNameBytes = utf8.GetBytes(cmd.fileName);
             System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
-            byteCnt += fileNameLen.Length;
+            byteCnt += fileNameLen;
 
             srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
             System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
