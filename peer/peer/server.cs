@@ -201,7 +201,7 @@ namespace socketSrv
         {
             commandMessage returnMsg = new commandMessage();
             byte[] msgLen = new byte[4];
-            byte[] fileNameBytes = new byte[75];
+            
             Int32 bufferCnt = 0;
 
             System.Buffer.BlockCopy(buf, bufferCnt, msgLen, 0, msgLen.Length);
@@ -229,21 +229,22 @@ namespace socketSrv
             switch (returnMsg.command)
             {
                 case 2: 
-                    //rest of the buffer is the filename to send
-                    byte [] fileNameSizeBytes = new byte[4];
-                    byte [] fileSizeBytes = new byte[4];
+                    byte[] filesize = new byte[4];
+                    byte[] fileNameSize = new byte[4];
+                    byte[] fileNameBytes = new byte[75];
 
-                    System.Buffer.BlockCopy(buf, bufferCnt, fileSizeBytes, 0, fileSizeBytes.Length);
-                    bufferCnt += fileSizeBytes.Length;
+                    System.Buffer.BlockCopy(buf, bufferCnt, filesize, 0, filesize.Length);
+                    bufferCnt += filesize.Length;
                     
-                    System.Buffer.BlockCopy(buf, bufferCnt, fileNameSizeBytes, 0, fileNameSizeBytes.Length);
-                    bufferCnt += fileNameSizeBytes.Length;
+                    System.Buffer.BlockCopy(buf, bufferCnt, fileNameSize, 0, fileNameSize.Length);
+                    bufferCnt += fileNameSize.Length;
+                    int fileLen = BitConverter.ToInt32(fileNameSize, 0);
 
-                    int fileByteCnt = bufBytes - bufferCnt;
-                    System.Buffer.BlockCopy(buf, bufferCnt, fileNameBytes, 0, fileByteCnt);
+                    System.Buffer.BlockCopy(buf, bufferCnt, fileNameBytes, 0, fileLen);
+                    bufferCnt += fileNameSize.Length;
 				
 					UTF8Encoding utf8 = new UTF8Encoding();
-					returnMsg.fileName = utf8.GetString(fileNameBytes,0,fileByteCnt);
+                    returnMsg.fileName = utf8.GetString(fileNameBytes, 0, fileLen);
 					//serverQueue.Enqueue(returnMsg);
 				
                     break;
@@ -278,7 +279,7 @@ namespace socketSrv
             // check if the remote host closed the connection
             AsyncUserToken token = (AsyncUserToken)e.UserToken;
             
-            byte[] myBuffer = new byte[1501];
+            byte[] myBuffer = new byte[1500];
             System.Buffer.BlockCopy(e.Buffer, e.Offset, myBuffer, 0, e.Count);
 
             commandMessage msg = parseCommandMessage(myBuffer, e.BytesTransferred);
@@ -355,8 +356,58 @@ namespace socketSrv
 	                //need to send msg to peer
                     string fileDir = Program.p2p.getFileDir();
                     msg.fileName = fileDir + msg.fileName;
-                    fileTransport g = new fileTransport();
-                    g.sendFile(msg);
+                    int fileNum = Program.p2p.fileLocal(msg.fileName);
+                    if (fileNum != int.MaxValue)
+                    {
+                        fileTransport g = new fileTransport();
+                        g.sendFile(msg);
+                    }
+                    else
+                    {
+                        //need to broadcast to all server clients
+                        //replyMsg = msg;
+                    
+                        //intBytes = BitConverter.GetBytes(16);
+                        //addressBytes = replyMsg.peerIP.GetAddressBytes();
+                        //portBytes = BitConverter.GetBytes(replyMsg.port);
+                        //cmdBytes = BitConverter.GetBytes(replyMsg.command);
+
+                        //System.Buffer.BlockCopy(intBytes, 0, myBuffer, 0, 4);  //prepends length to buffer
+                        //System.Buffer.BlockCopy(addressBytes, 0, myBuffer, 4, addressBytes.Length);
+                        //System.Buffer.BlockCopy(portBytes, 0, myBuffer, 4 + addressBytes.Length, portBytes.Length);
+                        //System.Buffer.BlockCopy(cmdBytes, 0, myBuffer, 4 + addressBytes.Length + portBytes.Length, cmdBytes.Length);
+                        
+                        AsyncUserToken relayToken;   // = (AsyncUserToken)e.UserToken;
+                        int msgLen = e.BytesTransferred;
+                        for (int i = 0; i < myAsyncList.Count; i++)
+                        {
+                            //don't send to peer who you got it from.  write that IF BUGBUG
+                            System.Buffer.BlockCopy(myBuffer, 0, myAsyncList[i].Buffer, myAsyncList[i].Offset, msgLen);
+                            relayToken = (AsyncUserToken)myAsyncList[i].UserToken;
+                            IPEndPoint iep = (IPEndPoint)relayToken.Socket.RemoteEndPoint;
+                            IPAddress ip = (IPAddress)iep.Address;
+                            //IPAddress.Equals()
+                            if (ip.Address != msg.peerIP.Address)
+                            {
+                                //if (myAsyncList[i].BytesTransferred > 0 && myAsyncList[i].SocketError == SocketError.Success)
+                                if (myAsyncList[i].SocketError == SocketError.Success)
+                                {
+                                    relayToken.Socket.Send(myBuffer, msgLen, SocketFlags.None);
+                                    //bool willRaiseEvent = token.Socket.SendAsync(myAsyncList[i]);
+
+                                    //if (!willRaiseEvent)
+                                    //{
+                                    //    ProcessSend(myAsyncList[i]);
+                                    //}
+
+                                }
+                                else
+                                {
+                                    CloseClientSocket(myAsyncList[i]);
+                                }
+                            }
+                        }
+                    }
 					//serverQueue.Add(msg);
 	                break;
             }
@@ -447,7 +498,7 @@ namespace socketSrv
             byte[] fileSizeBytes = new byte[4];
             
 			
-			Console.WriteLine("Sent request to client machine(s)\n");
+			//Console.WriteLine("Sent request to client machine(s)\n");
 			cmdBytes = BitConverter.GetBytes(cmd.command);
 			//msgLenBytes = BitConverter.GetBytes(16);
 			addressBytes = cmd.peerIP.GetAddressBytes();
@@ -484,28 +535,27 @@ namespace socketSrv
             msgLenBytes = BitConverter.GetBytes(msgLen);
             System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
 
-			AsyncUserToken token;   // = (AsyncUserToken)e.UserToken;
+			AsyncUserToken token;   
 			
 			for (int i=0;i<myAsyncList.Count;i++)
 			{
                 System.Buffer.BlockCopy(buffer, 0, myAsyncList[i].Buffer, myAsyncList[i].Offset, msgLen);
 				token = (AsyncUserToken)myAsyncList[i].UserToken;
-				//if (myAsyncList[i].BytesTransferred > 0 && myAsyncList[i].SocketError == SocketError.Success)
-                if (myAsyncList[i].SocketError == SocketError.Success)
-		            {
+
+                IPEndPoint iep = (IPEndPoint)token.Socket.RemoteEndPoint;
+                IPAddress ip = iep.Address;
+
+                if (cmd.peerIP.Address != ip.Address)
+                {
+                    if (myAsyncList[i].SocketError == SocketError.Success)
+                    {
                         token.Socket.Send(buffer, msgLen, SocketFlags.None);
-                        //bool willRaiseEvent = token.Socket.SendAsync(myAsyncList[i]);
-		                
-                        //if (!willRaiseEvent)
-                        //{
-                        //    ProcessSend(myAsyncList[i]);
-                        //}
-					
-		            }
-		            else
-		            {
-		                CloseClientSocket(myAsyncList[i]);
-		            }
+                    }
+                    else
+                    {
+                        CloseClientSocket(myAsyncList[i]);
+                    }
+                }
 			}
 			
 			return;	
