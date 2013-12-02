@@ -355,11 +355,12 @@ namespace socketSrv
                     
 	                //need to send msg to peer
                     string fileDir = Program.p2p.getFileDir();
-                    msg.fileName = fileDir + msg.fileName;
-                    int fileNum = Program.p2p.fileLocal(msg.fileName);
+                    //msg.fileName = fileDir + msg.fileName;
+                    int fileNum = Program.p2p.fileLocal(fileDir + msg.fileName);
                     if (fileNum != int.MaxValue)
                     {
                         fileTransport g = new fileTransport();
+						msg.fileName = fileDir + msg.fileName;
                         g.sendFile(msg);
                     }
                     else
