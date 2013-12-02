@@ -185,11 +185,11 @@ namespace peer
 							//need to rebroadcast msg to peers
 							if (queue==0) //server = 0, client = 1
 							{
-								c.SendCmd(msg);
+								s.SendCmd(msg);
 							}
 							else
 							{
-								s.SendCmd(msg);
+								c.SendCmd(msg);
 							}
 						}
 						
