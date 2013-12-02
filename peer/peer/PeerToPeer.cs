@@ -17,16 +17,19 @@ namespace peer
     class PeerToPeer
     {
         Random RNG = new Random();
-        //Int32 serverPort, clientPort;
+        
         TcpClient centralServer = new TcpClient();
         List<FileInfo> myFiles;
+
         string fileDir;
         string consoleCmd;
         
+		Client c;
+		Server s;
+
         IPAddress myAddress;
         public int myPort;
-        Client c;
-		Server s;
+        
 		
 		List<commandMessage> serverQueue = new List<commandMessage>();
 		List<commandMessage> clientQueue = new List<commandMessage>();
