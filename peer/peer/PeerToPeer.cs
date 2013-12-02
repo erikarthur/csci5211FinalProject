@@ -131,13 +131,13 @@ namespace peer
 				
 				if (serverQueue.Count > 0)
 				{
-					processQueue(serverQueue);
+					processQueue(serverQueue, 0);
 					serverQueue.Clear();
 				}
 				
 				if (clientQueue.Count > 0)
 				{
-					processQueue(clientQueue);
+					processQueue(clientQueue, 1);
 					clientQueue.Clear();
 				}
 				
@@ -162,7 +162,7 @@ namespace peer
             return fileDir;
         }
 		
-		public void processQueue(List<commandMessage> msgQueue)
+		public void processQueue(List<commandMessage> msgQueue, int queue)
 		{
 			commandMessage msg = new commandMessage();
 			for (int i=0;i<msgQueue.Count(); i++)
@@ -180,8 +180,20 @@ namespace peer
 							msg.fileName = myFiles[fileIndex].FullName;
 							g.sendFile(msg);
 						}
+						else 
+						{
+							//need to rebroadcast msg to peers
+							if (queue==0) //server = 0, client = 1
+							{
+								c.SendCmd(msg);
+							}
+							else
+							{
+								s.SendCmd(msg);
+							}
+						}
 						
-						//need to rebroadcast msg to peers
+						
 						
 						break;
 				case 3:  //put file
