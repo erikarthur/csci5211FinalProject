@@ -31,8 +31,8 @@ namespace peer
         public int myPort;
         
 		
-		List<commandMessage> serverQueue = new List<commandMessage>();
-		List<commandMessage> clientQueue = new List<commandMessage>();
+		public List<commandMessage> serverQueue = new List<commandMessage>();
+		public List<commandMessage> clientQueue = new List<commandMessage>();
  
         #if (WINDOWS)
             const char ENTERKEY = '\r';

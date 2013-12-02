@@ -376,37 +376,38 @@ namespace socketSrv
                         //System.Buffer.BlockCopy(addressBytes, 0, myBuffer, 4, addressBytes.Length);
                         //System.Buffer.BlockCopy(portBytes, 0, myBuffer, 4 + addressBytes.Length, portBytes.Length);
                         //System.Buffer.BlockCopy(cmdBytes, 0, myBuffer, 4 + addressBytes.Length + portBytes.Length, cmdBytes.Length);
-                        
-                        AsyncUserToken relayToken;   // = (AsyncUserToken)e.UserToken;
-                        int msgLen = e.BytesTransferred;
-                        for (int i = 0; i < myAsyncList.Count; i++)
-                        {
-                            //don't send to peer who you got it from.  write that IF BUGBUG
-                            System.Buffer.BlockCopy(myBuffer, 0, myAsyncList[i].Buffer, myAsyncList[i].Offset, msgLen);
-                            relayToken = (AsyncUserToken)myAsyncList[i].UserToken;
-                            IPEndPoint iep = (IPEndPoint)relayToken.Socket.RemoteEndPoint;
-                            IPAddress ip = (IPAddress)iep.Address;
-                            //IPAddress.Equals()
-                            if (ip.Address != msg.peerIP.Address)
-                            {
-                                //if (myAsyncList[i].BytesTransferred > 0 && myAsyncList[i].SocketError == SocketError.Success)
-                                if (myAsyncList[i].SocketError == SocketError.Success)
-                                {
-                                    relayToken.Socket.Send(myBuffer, msgLen, SocketFlags.None);
-                                    //bool willRaiseEvent = token.Socket.SendAsync(myAsyncList[i]);
-
-                                    //if (!willRaiseEvent)
-                                    //{
-                                    //    ProcessSend(myAsyncList[i]);
-                                    //}
-
-                                }
-                                else
-                                {
-                                    CloseClientSocket(myAsyncList[i]);
-                                }
-                            }
-                        }
+                        Program.p2p.clientQueue.Add(msg);
+//                        AsyncUserToken relayToken;   // = (AsyncUserToken)e.UserToken;
+//                        int msgLen = e.BytesTransferred;
+//                        for (int i = 0; i < myAsyncList.Count; i++)
+//                        {
+//							Program.p2p.clientQueue.Add(msg);
+//                            //don't send to peer who you got it from.  write that IF BUGBUG
+//                            System.Buffer.BlockCopy(myBuffer, 0, myAsyncList[i].Buffer, myAsyncList[i].Offset, msgLen);
+//                            relayToken = (AsyncUserToken)myAsyncList[i].UserToken;
+//                            IPEndPoint iep = (IPEndPoint)relayToken.Socket.RemoteEndPoint;
+//                            IPAddress ip = (IPAddress)iep.Address;
+//                            //IPAddress.Equals()
+//                            if (ip.Address != msg.peerIP.Address)
+//                            {
+//                                //if (myAsyncList[i].BytesTransferred > 0 && myAsyncList[i].SocketError == SocketError.Success)
+//                                if (myAsyncList[i].SocketError == SocketError.Success)
+//                                {
+//                                    relayToken.Socket.Send(myBuffer, msgLen, SocketFlags.None);
+//                                    //bool willRaiseEvent = token.Socket.SendAsync(myAsyncList[i]);
+//
+//                                    //if (!willRaiseEvent)
+//                                    //{
+//                                    //    ProcessSend(myAsyncList[i]);
+//                                    //}
+//
+//                                }
+//                                else
+//                                {
+//                                    CloseClientSocket(myAsyncList[i]);
+//                                }
+//                            }
+//                        }
                     }
 					//serverQueue.Add(msg);
 	                break;
