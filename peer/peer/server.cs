@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading;
 using peer;
 using ServerExperiment;
+using System.Timers;
 
 namespace socketSrv
 {
@@ -26,18 +27,20 @@ namespace socketSrv
         public List<peerInstance> peerList;
 		public List<SocketAsyncEventArgs> myAsyncList = new List<SocketAsyncEventArgs>();
         public int serverPort;
+		public System.Timers.Timer serverTimer;
 
         public Server(int numConns, int receiveSize)
         {
-            numConnectedSockets = 0;
-            numConnections = numConns;
-            receiveBufferSize = receiveSize;
-            bufferManager = new BufferManager(receiveBufferSize * numConnections * opsToPreAlloc, receiveBufferSize, numConnections);
-            asyncSocketStack = new SocketAsyncEventArgsStack(numConnections);
-            maxNumberAcceptedClients = new Semaphore(numConnections, numConnections);
-            peerList = new List<peerInstance>();
-            serverPort = 0;
-			serverQueue = new List<commandMessage>();
+			this.numConnectedSockets = 0;
+			this.numConnections = numConns;
+			this.receiveBufferSize = receiveSize;
+			this.bufferManager = new BufferManager(receiveBufferSize * numConnections * opsToPreAlloc, receiveBufferSize, numConnections);
+			this.asyncSocketStack = new SocketAsyncEventArgsStack(numConnections);
+			this.maxNumberAcceptedClients = new Semaphore(numConnections, numConnections);
+			this.peerList = new List<peerInstance>();
+			this.serverPort = 0;
+			this.serverQueue = new List<commandMessage>();
+			this.serverTimer.Elapsed += new ElapsedEventHandler (timer_Elapsed);
 			//commandMessage m = new commandMessage();
 			//serverQueue.Enqueue(m);
 			//m = serverQueue.Dequeue();
@@ -517,7 +520,12 @@ namespace socketSrv
             byte[] srcIpBytes = new byte[4];
             
 			
-			//Console.WriteLine("Sent request to client machine(s)\n");
+			Console.WriteLine("Sent request to client machine(s)\n");
+			cmd.timeStamp = DateTime.Now;
+			Program.p2p.clientProcessedQueue.Add (cmd);
+			serverTimer.Interval = 30000;
+			serverTimer.Start;
+
 			cmdBytes = BitConverter.GetBytes(cmd.command);
 			//msgLenBytes = BitConverter.GetBytes(16);
 			addressBytes = cmd.peerIP.GetAddressBytes();
@@ -569,7 +577,7 @@ namespace socketSrv
                 IPEndPoint iep = (IPEndPoint)token.Socket.RemoteEndPoint;
                 IPAddress ip = iep.Address;
 
-                if (cmd.srcIP.Address != ip.Address)
+                if (cmd.srcIP != ip)
                 {
                     if (myAsyncList[i].SocketError == SocketError.Success)
                     {
@@ -583,6 +591,18 @@ namespace socketSrv
 			}
 			
 			return;	
+		}
+
+		void timer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			DateTime now = DateTime.Now;
+			serverTimer.Stop ();
+			//find server messages older than 1 minute
+			for (int i = Program.p2p.clientProcessedQueue.Count; i > 0; i--) {
+				if (Program.p2p.clientProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
+					Program.p2p.clientProcessedQueue.RemoveAt (i);
+				}
+			}
 		}
 
     }

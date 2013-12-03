@@ -16,8 +16,15 @@ namespace socketSrv
         TcpClient tcpClient = new TcpClient(AddressFamily.InterNetwork);
         peerInstance myServer = new peerInstance();
         NetworkStream clientStream;
-        Timer timer = new Timer();
+		public Timer clientTimer = new Timer();
+		//clientTimer.ElapsedEventArgs += timer
+
 		public List<commandMessage> clientQueue = new List<commandMessage>();
+
+		public Client()
+		{
+			this.clientTimer.Elapsed += new ElapsedEventHandler (timer_Elapsed);
+		}
 
         public void setServer(peerInstance p)
         {
@@ -212,65 +219,71 @@ namespace socketSrv
 			
             switch( cmd.command)
             {
-                case 2:    //get file
-                    Console.WriteLine("\nSent request to server machine");
-                    //int basicCmdLen = 16;
-                    int byteCnt = 4;
+			case 2:    //get file
+				Console.WriteLine ("\nSent request to server machine");
 
-					cmdBytes = BitConverter.GetBytes(cmd.command);
-                    //msgLenBytes = BitConverter.GetBytes(basicCmdLen);
-					addressBytes = cmd.peerIP.GetAddressBytes();
-					portBytes = BitConverter.GetBytes(cmd.port);
-                    //System.Buffer.BlockCopy(msgLenBytes, 0, buffer, byteCnt, msgLenBytes.Length);
-                    //byteCnt += msgLenBytes.Length;
+				//add command to serverProcessedQueue
+				Program.p2p.serverProcessedQueue.Add (cmd);
+				clientTimer.Interval = 30000;
+				clientTimer.Start ();
 
-                    System.Buffer.BlockCopy(addressBytes, 0, buffer, byteCnt, addressBytes.Length);
-                    byteCnt += addressBytes.Length;
+                //int basicCmdLen = 16;
+                int byteCnt = 4;
 
-                    System.Buffer.BlockCopy(portBytes, 0, buffer, byteCnt, portBytes.Length);
-                    byteCnt += portBytes.Length;
+				cmdBytes = BitConverter.GetBytes(cmd.command);
+                //msgLenBytes = BitConverter.GetBytes(basicCmdLen);
+				addressBytes = cmd.peerIP.GetAddressBytes();
+				portBytes = BitConverter.GetBytes(cmd.port);
+                //System.Buffer.BlockCopy(msgLenBytes, 0, buffer, byteCnt, msgLenBytes.Length);
+                //byteCnt += msgLenBytes.Length;
 
-                    System.Buffer.BlockCopy(cmdBytes, 0, buffer, byteCnt, cmdBytes.Length);
-                    byteCnt += cmdBytes.Length;
+                System.Buffer.BlockCopy(addressBytes, 0, buffer, byteCnt, addressBytes.Length);
+                byteCnt += addressBytes.Length;
+
+                System.Buffer.BlockCopy(portBytes, 0, buffer, byteCnt, portBytes.Length);
+                byteCnt += portBytes.Length;
+
+                System.Buffer.BlockCopy(cmdBytes, 0, buffer, byteCnt, cmdBytes.Length);
+                byteCnt += cmdBytes.Length;
+			
+                UTF8Encoding utf8 = new UTF8Encoding();
+                fileNameBytes = utf8.GetBytes(cmd.fileName);
+                int fileNameLen = utf8.GetByteCount(cmd.fileName);
+			
+				fileSizeBytes = BitConverter.GetBytes(0);
+				fileNameSizeBytes = BitConverter.GetBytes(fileNameLen);
 				
-                    UTF8Encoding utf8 = new UTF8Encoding();
-                    fileNameBytes = utf8.GetBytes(cmd.fileName);
-                    int fileNameLen = utf8.GetByteCount(cmd.fileName);
+				System.Buffer.BlockCopy(fileSizeBytes, 0, buffer, byteCnt, fileSizeBytes.Length);
+                byteCnt += fileSizeBytes.Length;
 				
-					fileSizeBytes = BitConverter.GetBytes(0);
-					fileNameSizeBytes = BitConverter.GetBytes(fileNameLen);
-					
-					System.Buffer.BlockCopy(fileSizeBytes, 0, buffer, byteCnt, fileSizeBytes.Length);
-                    byteCnt += fileSizeBytes.Length;
-					
-					System.Buffer.BlockCopy(fileNameSizeBytes, 0, buffer, byteCnt, fileNameSizeBytes.Length);
-                    byteCnt += fileNameSizeBytes.Length;
+				System.Buffer.BlockCopy(fileNameSizeBytes, 0, buffer, byteCnt, fileNameSizeBytes.Length);
+                byteCnt += fileNameSizeBytes.Length;
 
-                    System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
-                    byteCnt += fileNameLen;
+                System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
+                byteCnt += fileNameLen;
 
-                    srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
-                    System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
-                    byteCnt += srcIpBytes.Length;
+                srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
+                System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
+                byteCnt += srcIpBytes.Length;
 
-                    int msgLen = byteCnt;
-                    msgLenBytes = BitConverter.GetBytes(msgLen);
-                    System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
+                int msgLen = byteCnt;
+                msgLenBytes = BitConverter.GetBytes(msgLen);
+                System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
 
-                    //if (cmd.srcIP.Address.ToString() == "0.0.0.0")
-                    cmd.srcIP = Program.p2p.myAddress;
+                //if (cmd.srcIP.Address.ToString() == "0.0.0.0")
+                cmd.srcIP = Program.p2p.myAddress;
 
-                    if (cmd.srcIP.Address != cmd.peerIP.Address)
-                    {
-                        clientStream.Write(buffer, 0, msgLen);
-                        Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
-                    }
-                    
-					break;
+                if (cmd.srcIP.Address != cmd.peerIP.Address)
+                {
+                    clientStream.Write(buffer, 0, msgLen);
+                    Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
+                }
+                
+				break;
 
-                case 3:     //put file
-                    Console.WriteLine("got a put");
-                    break;
+            case 3:     //put file
+                Console.WriteLine("got a put");
+                break;
 
             }
 
@@ -278,20 +291,14 @@ namespace socketSrv
 
         void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("Sent data");
-            Int32 messageID = 0;
-            int clientMsgStreamLength = (int)(2 * sizeof(Int32));
-            byte[] buffer = new byte[4096];
-
-            byte[] intBytes = BitConverter.GetBytes(clientMsgStreamLength);
-
-            byte[] messageBytes = BitConverter.GetBytes(messageID);
-
-            System.Buffer.BlockCopy(intBytes, 0, buffer, 0, 4);  //prepends length to buffer
-            System.Buffer.BlockCopy(messageBytes, 0, buffer, 4, messageBytes.Length);
-
-            clientStream.Write(buffer, 0, clientMsgStreamLength);
-            clientStream.Flush();
+			DateTime now = DateTime.Now;
+			clientTimer.Stop ();
+			//find server messages older than 1 minute
+			for (int i = Program.p2p.serverProcessedQueue.Count (); i > 0; i--) {
+				if (Program.p2p.serverProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
+					Program.p2p.serverProcessedQueue.RemoveAt (i);
+				}
+			}
         }
     }
 

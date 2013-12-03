@@ -15,6 +15,7 @@ namespace socketSrv
         private string _fileDir;
         private IPAddress _putIP;
         private IPAddress _srcIP;
+		private DateTime _timeStamp;
 
         public commandMessage()
         {
@@ -26,7 +27,14 @@ namespace socketSrv
             peerHostname = "";
             port = Int32.MaxValue;
             command = Int32.MaxValue;
+			timeStamp = DateTime.Now;
         }
+
+		public DateTime timeStamp
+		{
+			get {return _timeStamp; }
+			set { _timeStamp = value; }
+		}
 
         public string fileName
         {

@@ -33,6 +33,9 @@ namespace peer
 		
 		public List<commandMessage> serverQueue = new List<commandMessage>();
 		public List<commandMessage> clientQueue = new List<commandMessage>();
+
+		public List<commandMessage> serverProcessedQueue = new List<commandMessage>();
+		public List<commandMessage> clientProcessedQueue = new List<commandMessage>();
  
         #if (WINDOWS)
             const char ENTERKEY = '\r';
@@ -169,6 +172,22 @@ namespace peer
 			{
                 msg = msgQueue[i];
                 msgQueue.RemoveAt(i);
+				bool serverSent = false;
+				bool clientSent = false;
+
+				if (serverProcessedQueue.Count > 0) {
+					for (int j=0;i<serverProcessedQueue.Count;j++) {
+						if ((msg.peerIP == serverProcessedQueue[j].peerIP) && (msg.fileName == serverProcessedQueue[j].fileName))
+							serverSent = true;
+					}
+				}
+
+				if (clientProcessedQueue.Count > 0) {
+					for (int j=0;i<clientProcessedQueue.Count;j++) {
+						if ((msg.peerIP == clientProcessedQueue[j].peerIP) && (msg.fileName == clientProcessedQueue[j].fileName))
+							clientSent = true;
+					}
+				}
 				
 				switch (msg.command)
 				{
@@ -183,18 +202,20 @@ namespace peer
 						else 
 						{
 							//need to rebroadcast msg to peers
-							if (queue==0) //server = 0, client = 1
-							{
-							if (c != null)
-								c.SendCmd(msg);
-								s.SendCmd(msg);  //need to fix.  cycling
+						if (queue == 0) { //server = 0, client = 1
+							if (!clientSent) {
+								if (c != null) {
+									c.SendCmd (msg);
+								}
+								s.SendCmd (msg);  //need to fix.  cycling
 							}
-							else
-							{
-								s.SendCmd(msg);
-							if (c != null)
-								c.SendCmd(msg);
+						} else {
+							if (!serverSent) {
+								s.SendCmd (msg);
+								if (c != null)
+									c.SendCmd (msg);
 							}
+						}
 						}
 						
 						
