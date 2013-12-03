@@ -383,6 +383,7 @@ namespace socketSrv
                         //System.Buffer.BlockCopy(addressBytes, 0, myBuffer, 4, addressBytes.Length);
                         //System.Buffer.BlockCopy(portBytes, 0, myBuffer, 4 + addressBytes.Length, portBytes.Length);
                         //System.Buffer.BlockCopy(cmdBytes, 0, myBuffer, 4 + addressBytes.Length + portBytes.Length, cmdBytes.Length);
+					    Console.WriteLine("in server process. Command is {0} and srcIP is {1}", msg.command, msg.srcIP);
                         Program.p2p.clientQueue.Add(msg);
 //                        AsyncUserToken relayToken;   // = (AsyncUserToken)e.UserToken;
 //                        int msgLen = e.BytesTransferred;

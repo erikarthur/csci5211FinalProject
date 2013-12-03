@@ -80,6 +80,7 @@ namespace socketSrv
 				int bytesRead = clientStream.Read(buffer,0,bufSize);
 				if (bytesRead > 0)
 				{
+					
 					byteCnt = 0;
 					System.Buffer.BlockCopy(buffer, byteCnt, messageSizeBytes, 0, messageSizeBytes.Length);
 					byteCnt += messageSizeBytes.Length;
@@ -133,7 +134,7 @@ namespace socketSrv
                     }
 
                     cmd.srcIP = IPAddress.Parse(address);
-
+					Console.WriteLine("in client process. Command is {0} and srcIP is {1}", cmd.command, cmd.srcIP); 
 					clientQueue.Add(cmd);
 				}
 			}
