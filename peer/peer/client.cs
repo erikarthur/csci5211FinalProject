@@ -256,6 +256,9 @@ namespace socketSrv
                     msgLenBytes = BitConverter.GetBytes(msgLen);
                     System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
 
+                    if (cmd.srcIP.Address == null)
+                        cmd.srcIP = Program.p2p.myAddress;
+
                     if (cmd.srcIP.Address != cmd.peerIP.Address)
                     {
                         clientStream.Write(buffer, 0, msgLen);
