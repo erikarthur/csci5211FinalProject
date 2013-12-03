@@ -16,6 +16,17 @@ namespace socketSrv
         private IPAddress _putIP;
         private IPAddress _srcIP;
 
+        public commandMessage()
+        {
+            fileName = "";
+            fileDir = "";
+            peerIP = IPAddress.Parse("0.0.0.0");
+            srcIP = IPAddress.Parse("0.0.0.0");
+            putIP = IPAddress.Parse("0.0.0.0");
+            peerHostname = "";
+            port = Int32.MaxValue;
+            command = Int32.MaxValue;
+        }
 
         public string fileName
         {
