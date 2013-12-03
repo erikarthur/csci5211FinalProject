@@ -27,7 +27,7 @@ namespace peer
 		Client c;
 		Server s;
 
-        IPAddress myAddress;
+        public IPAddress myAddress;
         public int myPort;
         
 		

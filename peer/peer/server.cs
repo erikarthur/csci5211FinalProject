@@ -245,6 +245,12 @@ namespace socketSrv
 				
 					UTF8Encoding utf8 = new UTF8Encoding();
                     returnMsg.fileName = utf8.GetString(fileNameBytes, 0, fileLen);
+                    bufferCnt += fileLen;
+
+                    byte[] srcIpBytes = new byte[4];
+                    System.Buffer.BlockCopy(buf, bufferCnt, srcIpBytes, 0, srcIpBytes.Length);
+                    bufferCnt += srcIpBytes.Length;
+                    returnMsg.srcIP = new IPAddress(srcIpBytes);
 					//serverQueue.Enqueue(returnMsg);
 				
                     break;
@@ -498,6 +504,7 @@ namespace socketSrv
             byte[] fileNameSizeBytes = new byte[4];
             byte[] fileNameBytes = new byte[75];
             byte[] fileSizeBytes = new byte[4];
+            byte[] srcIpBytes = new byte[4];
             
 			
 			//Console.WriteLine("Sent request to client machine(s)\n");
@@ -532,8 +539,13 @@ namespace socketSrv
 
             fileNameBytes = utf8.GetBytes(cmd.fileName);
             System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
+            byteCnt += fileNameLen.Length;
 
-            int msgLen = byteCnt + fileNameLen;
+            srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
+            System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
+            byteCnt += srcIpBytes.Length;
+
+            int msgLen = byteCnt;
             msgLenBytes = BitConverter.GetBytes(msgLen);
             System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
 
@@ -547,7 +559,7 @@ namespace socketSrv
                 IPEndPoint iep = (IPEndPoint)token.Socket.RemoteEndPoint;
                 IPAddress ip = iep.Address;
 
-                if (cmd.peerIP.Address != ip.Address)
+                if (cmd.srcIP.Address != ip.Address)
                 {
                     if (myAsyncList[i].SocketError == SocketError.Success)
                     {

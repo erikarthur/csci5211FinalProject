@@ -14,6 +14,7 @@ namespace socketSrv
         private string _fileName;
         private string _fileDir;
         private IPAddress _putIP;
+        private IPAddress _srcIP;
 
 
         public string fileName
@@ -32,6 +33,12 @@ namespace socketSrv
         {
             get { return _putIP; }
             set { _putIP = value; }
+        }
+
+        public IPAddress srcIP
+        {
+            get { return _srcIP; }
+            set { _srcIP = value; }
         }
 
 		public IPAddress peerIP {

@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using peer;
+using ServerExperiment;
 
 namespace socketSrv
 {
@@ -67,6 +69,7 @@ namespace socketSrv
 				byte [] cmdBytes = new byte[4];
 				byte [] fileSizeBytes = new byte[4];
 				byte [] fileNameSizeBytes = new byte[4];
+                byte[] srcIpBytes = new byte[4];
 				
 			
 				int messageSize, fileSize, fileNameSize, cmdNum, byteCnt;
@@ -117,6 +120,20 @@ namespace socketSrv
 					System.Buffer.BlockCopy(buffer, byteCnt, fileNameBytes, 0, fileNameSize);
 					
 					cmd.fileName = utf8.GetString(fileNameBytes);
+
+                    byteCnt += fileNameSize;
+
+                    System.Buffer.BlockCopy(buffer, byteCnt, srcIpBytes, 0, srcIpBytes.Length);
+                    
+                    address = "";
+                    if (srcIpBytes.Length == 4)
+                    {
+                        address = addressBytes[0].ToString() + "." + addressBytes[1].ToString() + "." +
+                            addressBytes[2].ToString() + "." + addressBytes[3].ToString();
+                    }
+
+                    cmd.srcIP = IPAddress.Parse(address);
+
 					clientQueue.Add(cmd);
 				}
 			}
@@ -190,6 +207,7 @@ namespace socketSrv
             byte[]  fileNameBytes = new byte[75];
 			byte[]  fileNameSizeBytes = new byte[4];
 			byte[]  fileSizeBytes = new byte[4];
+            byte[] srcIpBytes = new byte[4];
 			
             switch( cmd.command)
             {
@@ -213,8 +231,6 @@ namespace socketSrv
 
                     System.Buffer.BlockCopy(cmdBytes, 0, buffer, byteCnt, cmdBytes.Length);
                     byteCnt += cmdBytes.Length;
-					
-				
 				
                     UTF8Encoding utf8 = new UTF8Encoding();
                     fileNameBytes = utf8.GetBytes(cmd.fileName);
@@ -230,13 +246,21 @@ namespace socketSrv
                     byteCnt += fileNameSizeBytes.Length;
 
                     System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
+                    byteCnt += fileNameLen;
 
-                    int msgLen = byteCnt + fileNameLen;
+                    srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
+                    System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
+                    byteCnt += srcIpBytes.Length;
+
+                    int msgLen = byteCnt;
                     msgLenBytes = BitConverter.GetBytes(msgLen);
                     System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
 
-                    clientStream.Write(buffer, 0, msgLen);
-                    Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
+                    if (cmd.srcIP.Address != cmd.peerIP.Address)
+                    {
+                        clientStream.Write(buffer, 0, msgLen);
+                        Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
+                    }
                     
 					break;
 
