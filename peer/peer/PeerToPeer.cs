@@ -186,7 +186,7 @@ namespace peer
 							if (queue==0) //server = 0, client = 1
 							{
 								c.SendCmd(msg);
-								s.SendCmd(msg);
+								s.SendCmd(msg);  //need to fix.  cycling
 							}
 							else
 							{
