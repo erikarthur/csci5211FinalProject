@@ -524,7 +524,7 @@ namespace socketSrv
 			cmd.timeStamp = DateTime.Now;
 			Program.p2p.clientProcessedQueue.Add (cmd);
 			serverTimer.Interval = 30000;
-			serverTimer.Start;
+			serverTimer.Start();
 
 			cmdBytes = BitConverter.GetBytes(cmd.command);
 			//msgLenBytes = BitConverter.GetBytes(16);
