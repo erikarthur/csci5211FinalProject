@@ -302,10 +302,10 @@ namespace peer
             //server.ExclusiveAddressUse = true;
             //server.Start();
             socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
-            IPEndPoint iep = new IPEndPoint(IPAddress.Any, cmd.port);
+            IPEndPoint iep = new IPEndPoint(cmd.peerIP, cmd.port);
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sock.Bind((EndPoint)iep);
-            sock.Listen(1);
+            sock.Bind(iep);
+            sock.Listen(10);
 
             //ioTimeout.Elapsed += ioTimeout_Elapsed;
             //ioTimeout.Interval = 27000;

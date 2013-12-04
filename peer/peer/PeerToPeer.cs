@@ -390,6 +390,7 @@ namespace peer
                         
                         cmdPutMsg.peerIP = Program.p2p.myAddress; 
                         cmdPutMsg.port = 8001 + RNG.Next(2999);
+						
 
                         cmdPutMsg.fileName = myFiles[putFileIndex].FullName;
                         
@@ -400,6 +401,7 @@ namespace peer
                         
                         fileTransport g2 = new fileTransport();
                         Thread t2 = new Thread(g2.sendPutFile);
+						Console.WriteLine("Opened the socket to put the file");
                         t2.Start(cmdPutMsg);
 
                         cmdPutMsg.fileName = cmdParts[1];
