@@ -133,14 +133,20 @@ namespace socketSrv
 
                     System.Buffer.BlockCopy(buffer, byteCnt, srcIpBytes, 0, srcIpBytes.Length);
                     
+                    cmd.srcIP = IPAddress.Parse(address);
+                    
                     address = "";
+                    
                     if (srcIpBytes.Length == 4)
                     {
-                        address = addressBytes[0].ToString() + "." + addressBytes[1].ToString() + "." +
-                            addressBytes[2].ToString() + "." + addressBytes[3].ToString();
+                        address = srcIpBytes[0].ToString() + "." + srcIpBytes[1].ToString() + "." +
+                            srcIpBytes[2].ToString() + "." + srcIpBytes[3].ToString();
                     }
 
-                    cmd.srcIP = IPAddress.Parse(address);
+                    
+                    if (cmd.command == 3)
+                        cmd.putIP = IPAddress.Parse(address);
+
 					Console.WriteLine("in client process. Command is {0} and srcIP is {1}", cmd.command, cmd.srcIP); 
 					clientQueue.Add(cmd);
                     //Program.p2p.clientProcessedQueue.Add(cmd);
