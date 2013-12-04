@@ -172,6 +172,10 @@ namespace peer
 			{
                 msg = msgQueue[i];
                 msgQueue.RemoveAt(i);
+
+                if (msg == null)
+                    return;
+                
 				bool serverSent = true;
 				bool clientSent = true;
 
