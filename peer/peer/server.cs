@@ -519,7 +519,16 @@ namespace socketSrv
             byte[] fileNameBytes = new byte[75];
             byte[] fileSizeBytes = new byte[4];
             byte[] srcIpBytes = new byte[4];
-            
+
+            for (int i = 0; i < Program.p2p.clientProcessedQueue.Count; i++)
+            {
+                if ((Program.p2p.clientProcessedQueue[i].peerIP.Address == cmd.peerIP.Address) &&
+                (Program.p2p.clientProcessedQueue[i].fileName == cmd.fileName))
+                {
+                    Console.WriteLine("Got duplicate cmd.  Aborting send.");
+                    return;
+                }
+            }
 			
 			Console.WriteLine("Sent request to client machine(s)\n");
 			cmd.timeStamp = DateTime.Now;
