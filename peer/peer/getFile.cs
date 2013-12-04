@@ -96,7 +96,17 @@ namespace peer
 			Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			
 			IPEndPoint iep = new IPEndPoint(cmd.peerIP, cmd.port);
-			sock.Connect(iep);
+            try
+            {
+                sock.Connect(iep);
+            }
+            catch (SocketException SE)
+            {
+                Console.WriteLine("Could not open socket\n" + SE.ErrorCode.ToString());
+                Console.WriteLine(SE.Message);
+                return;
+            }
+
 			//TcpClient tcpSendFile = new TcpClient(iep);
 			NetworkStream netStream = new NetworkStream(sock);
 			
