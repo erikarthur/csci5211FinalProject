@@ -176,15 +176,15 @@ namespace peer
 				bool clientSent = false;
 
 				if (serverProcessedQueue.Count > 0) {
-					for (int j=0;i<serverProcessedQueue.Count;j++) {
+					for (int j=0;j<serverProcessedQueue.Count;j++) {
 						if ((msg.peerIP == serverProcessedQueue[j].peerIP) && (msg.fileName == serverProcessedQueue[j].fileName))
 							serverSent = true;
 					}
 				}
 
 				if (clientProcessedQueue.Count > 0) {
-					for (int j=0;i<clientProcessedQueue.Count;j++) {
-						if ((msg.peerIP == clientProcessedQueue[j].peerIP) && (msg.fileName == clientProcessedQueue[j].fileName))
+					for (int k=0;k<clientProcessedQueue.Count;k++) {
+						if ((msg.peerIP == clientProcessedQueue[k].peerIP) && (msg.fileName == clientProcessedQueue[k].fileName))
 							clientSent = true;
 					}
 				}
