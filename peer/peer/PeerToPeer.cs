@@ -1,5 +1,5 @@
 ﻿
-#undef WINDOWS   //comment out for linux or unix
+#define WINDOWS   //comment out for linux or unix
 
 
 using socketSrv;

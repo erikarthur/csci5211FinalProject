@@ -265,6 +265,8 @@ namespace peer
 
             fileName = utf8.GetString(fileNameBytes);
 
+            cmd.fileDir = Program.p2p.getFileDir();
+
             int bytesLeft = (24 + fileNameSize + fileSize);
             BinaryWriter fs = new BinaryWriter(File.Open(cmd.fileDir + fileName, FileMode.CreateNew));
 
