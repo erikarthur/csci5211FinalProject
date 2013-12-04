@@ -48,14 +48,14 @@ namespace socketSrv
 			List<commandMessage> tempQueue = new List<commandMessage>();
 			tempQueue = clientQueue;
 			
-			if (clientQueue.Count > 1)
-			{
+            //if (clientQueue.Count > 1)
+            //{
 				
-				//lock(serverQueue)
-				//{
-				clientQueue.Clear();
-				//}
-			}
+            //    //lock(serverQueue)
+            //    //{
+            //    clientQueue.Clear();
+            //    //}
+            //}
 			
 			
 			return tempQueue;
@@ -88,7 +88,7 @@ namespace socketSrv
 				if (bytesRead > 0)
 				{
 					
-					byteCnt = 0;
+				byteCnt = 0;
 					System.Buffer.BlockCopy(buffer, byteCnt, messageSizeBytes, 0, messageSizeBytes.Length);
 					byteCnt += messageSizeBytes.Length;
 					messageSize = BitConverter.ToInt32(messageSizeBytes,0);

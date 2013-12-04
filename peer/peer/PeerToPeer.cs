@@ -172,20 +172,20 @@ namespace peer
 			{
                 msg = msgQueue[i];
                 msgQueue.RemoveAt(i);
-				bool serverSent = false;
-				bool clientSent = false;
+				bool serverSent = true;
+				bool clientSent = true;
 
 				if (serverProcessedQueue.Count > 0) {
 					for (int j=0;j<serverProcessedQueue.Count;j++) {
 						if ((msg.peerIP == serverProcessedQueue[j].peerIP) && (msg.fileName == serverProcessedQueue[j].fileName))
-							serverSent = true;
+							serverSent = false;
 					}
 				}
 
 				if (clientProcessedQueue.Count > 0) {
 					for (int k=0;k<clientProcessedQueue.Count;k++) {
 						if ((msg.peerIP == clientProcessedQueue[k].peerIP) && (msg.fileName == clientProcessedQueue[k].fileName))
-							clientSent = true;
+							clientSent = false;
 					}
 				}
 				
@@ -194,33 +194,36 @@ namespace peer
 				case 2:  //get file
 						int fileIndex = fileLocal(msg.fileName);
 						if (fileIndex != int.MaxValue)
-						{
-							fileTransport g = new fileTransport();
-							msg.fileName = myFiles[fileIndex].FullName;
-							g.sendFile(msg);
-						}
+						    {
+							    fileTransport g = new fileTransport();
+							    msg.fileName = myFiles[fileIndex].FullName;
+							    g.sendFile(msg);
+						    }
 						else 
-						{
-							//need to rebroadcast msg to peers
-						if (queue == 0) { //server = 0, client = 1
-							if (clientSent) {
-								if (c != null) {
-									c.SendCmd (msg);
-								}
-								s.SendCmd (msg);  //need to fix.  cycling
-							}
-						} else {
-							if (serverSent) {
-								s.SendCmd (msg);
-								if (c != null)
-									c.SendCmd (msg);
-							}
-						}
-						}
-						
-						
-						
-						break;
+						    {
+							    //need to rebroadcast msg to peers
+						    if (queue == 0) 
+                                { //server = 0, client = 1
+							        if (clientSent) 
+                                    {
+								        if (c != null) 
+									        c.SendCmd (msg);
+
+								        s.SendCmd (msg);  //need to fix.  cycling
+							        }
+						        } 
+                            else 
+                                {
+							        if (serverSent) 
+                                    {
+								        s.SendCmd (msg);
+								        if (c != null)
+									        c.SendCmd (msg);
+							        }
+						        }
+						    }
+
+    						break;
 				case 3:  //put file
 						fileTransport g2 = new fileTransport();
                         msg.fileName = fileDir + msg.fileName;
