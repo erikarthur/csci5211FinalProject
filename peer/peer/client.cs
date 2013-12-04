@@ -218,9 +218,9 @@ namespace socketSrv
 			byte[]  fileSizeBytes = new byte[4];
             byte[] srcIpBytes = new byte[4];
 			
-            switch( cmd.command)
-            {
-			case 2:    //get file
+            //switch( cmd.command)
+            //{
+            //case 2:    //get file
 				
                 //check processedQueue for cmd
                     for (int i = 0; i < Program.p2p.serverProcessedQueue.Count;i++)
@@ -228,14 +228,14 @@ namespace socketSrv
                         if ((Program.p2p.serverProcessedQueue[i].peerIP.Address == cmd.peerIP.Address) && 
                         (Program.p2p.serverProcessedQueue[i].fileName == cmd.fileName))
                         {
-                            Console.WriteLine("Got duplicate cmd.  Aborting send.");
+                            //Console.WriteLine("Got duplicate cmd.  Aborting send.");
                             return;
                         }
                     }
 
                     Console.WriteLine("\nSent request to server machine");
 
-				    clientTimer.Interval = 30000;
+				    clientTimer.Interval = 5000;
 				    clientTimer.Start ();
 
                     //int basicCmdLen = 16;
@@ -291,13 +291,13 @@ namespace socketSrv
                     }
                     //add command to serverProcessedQueue
                     Program.p2p.serverProcessedQueue.Add(cmd);
-				    break;
+				    //break;
 
-            case 3:     //put file
-                Console.WriteLine("got a put");
-                break;
+            //case 3:     //put file
+            //    Console.WriteLine("got a put");
+            //    break;
 
-            }
+            //}
 
         }
 
@@ -308,6 +308,7 @@ namespace socketSrv
 			//find server messages older than 1 minute
 			for (int i = Program.p2p.serverProcessedQueue.Count-1; i >= 0; i--) {
 				if (Program.p2p.serverProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
+                    Console.WriteLine("{0} file not received socket timed out.", Program.p2p.serverProcessedQueue[i].fileName);
 					Program.p2p.serverProcessedQueue.RemoveAt (i);
 				}
 			}

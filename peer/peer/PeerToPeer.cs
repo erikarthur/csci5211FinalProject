@@ -11,6 +11,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using peer;
+using ServerExperiment;
 
 namespace peer
 {
@@ -29,7 +31,7 @@ namespace peer
 
         public IPAddress myAddress;
         public int myPort;
-        
+        public List<string> fileReceived = new List<string>();
 		
 		public List<commandMessage> serverQueue = new List<commandMessage>();
 		public List<commandMessage> clientQueue = new List<commandMessage>();
@@ -215,7 +217,7 @@ namespace peer
 								        if (c != null) 
 									        c.SendCmd (msg);
 
-								        s.SendCmd (msg);  //need to fix.  cycling
+								        s.SendCmd (msg);  
 							        }
 						        } 
                             else 
@@ -231,13 +233,42 @@ namespace peer
 
     						break;
 				case 3:  //put file
-						fileTransport g2 = new fileTransport();
-                        msg.fileName = fileDir + msg.fileName;
-						g2.getFile(msg);
+                       
+						int pfileIndex = fileLocal(msg.fileName);
+						if (pfileIndex != int.MaxValue)
+						    {
+                                fileTransport g2 = new fileTransport();
+                                Thread t2 = new Thread(g2.receivePutFile);
+                                t2.Start(msg);
+						    }
+						else 
+						    {
+							//need to rebroadcast msg to peers
+						    if (queue == 0) 
+                                { //server = 0, client = 1
+							        if (clientSent) 
+                                    {
+								        if (c != null) 
+									        c.SendCmd (msg);
+                                        if (s.myAsyncList.Count != 0)
+								            s.SendCmd (msg);  
+							        }
+						        } 
+                            else 
+                                {
+							        if (serverSent) 
+                                    {
+                                        if (s.myAsyncList.Count != 0)
+                                            s.SendCmd (msg);
+								        
+                                        if (c != null)
+									        c.SendCmd (msg);
+							        }
+						        }
+						    }
+
 						break;
-                //case 0:  //refresh filelist
-                //        refreshFileList(fileDir);
-                //        break;
+                
 				}
 			}
 		}
@@ -348,16 +379,38 @@ namespace peer
 				}
 				else
 				{
-					Console.WriteLine("got a put for file: " + cmdParts[1] + "\n");
+					Console.WriteLine("Sending out a put for file: " + cmdParts[1] + "\n");
+
                     socketSrv.commandMessage cmdPutMsg = new socketSrv.commandMessage();
-                    cmdPutMsg.command = 3;
-                    cmdPutMsg.fileName = cmdParts[1];
-                    IPHostEntry tempIP = Dns.GetHostEntry(cmdParts[2]);
-                    cmdPutMsg.putIP = tempIP.AddressList[0];
-                    if (c != null)
-                        c.SendCmd(cmdPutMsg);
-					
-				}
+
+                    int putFileIndex = fileLocal(cmdParts[1]);
+                    if (putFileIndex != int.MaxValue)
+                    {
+                        cmdPutMsg.command = 3;
+                        
+                        cmdPutMsg.peerIP = Program.p2p.myAddress; 
+                        cmdPutMsg.port = 8001 + RNG.Next(2999);
+
+                        cmdPutMsg.fileName = myFiles[putFileIndex].FullName;
+                        
+                        IPHostEntry tempIP = Dns.GetHostEntry(cmdParts[2]);
+                        cmdPutMsg.putIP = tempIP.AddressList[0];
+                        
+                        cmdPutMsg.timeStamp = DateTime.Now;
+                        
+                        fileTransport g2 = new fileTransport();
+                        Thread t2 = new Thread(g2.sendPutFile);
+                        t2.Start(cmdPutMsg);
+
+                        cmdPutMsg.fileName = cmdParts[1];
+
+                        if (c != null)
+                            c.SendCmd(cmdPutMsg);
+                        
+                        s.SendCmd(cmdPutMsg);
+                    }
+                   
+ 				}
 				break;
 				
 			case "LIST":
@@ -374,10 +427,7 @@ namespace peer
 			}
 		}
 		
-		public void openSocketWaitForFile(socketSrv.commandMessage commandcmdGetMsg)
-		{
-			return;	
-		}
+
 		
 		public void printMsg(string msg)
 		{
