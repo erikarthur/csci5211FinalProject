@@ -120,7 +120,12 @@ namespace peer
 			}
 			else
 				return;
-			
+
+			if (fileSize == 0) {
+				Console.WriteLine ("{0} is 0 length.  Zero length files are not supported", fileName);
+				return;
+			}
+
 			bufCnt = 0;
 			
 			messageSizeBytes = BitConverter.GetBytes(0);
