@@ -40,6 +40,7 @@ namespace socketSrv
 			this.peerList = new List<peerInstance>();
 			this.serverPort = 0;
 			this.serverQueue = new List<commandMessage>();
+			this.serverTimer = new System.Timers.Timer ();
 			this.serverTimer.Elapsed += new ElapsedEventHandler (timer_Elapsed);
 			//commandMessage m = new commandMessage();
 			//serverQueue.Enqueue(m);
