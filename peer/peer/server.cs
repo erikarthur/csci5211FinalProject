@@ -564,6 +564,8 @@ namespace socketSrv
             System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
             byteCnt += srcIpBytes.Length;
 
+            cmd.srcIP = Program.p2p.myAddress;
+
             int msgLen = byteCnt;
             msgLenBytes = BitConverter.GetBytes(msgLen);
             System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);
