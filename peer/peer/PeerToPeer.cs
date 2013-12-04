@@ -203,14 +203,14 @@ namespace peer
 						{
 							//need to rebroadcast msg to peers
 						if (queue == 0) { //server = 0, client = 1
-							if (!clientSent) {
+							if (clientSent) {
 								if (c != null) {
 									c.SendCmd (msg);
 								}
 								s.SendCmd (msg);  //need to fix.  cycling
 							}
 						} else {
-							if (!serverSent) {
+							if (serverSent) {
 								s.SendCmd (msg);
 								if (c != null)
 									c.SendCmd (msg);
@@ -244,9 +244,12 @@ namespace peer
 
 				if (cki.Key == ConsoleKey.Backspace) 
 				{
-					Console.Write (" ");
-					Console.Write("\b");
-					consoleCmd = consoleCmd.Substring (0, consoleCmd.Length - 1);
+                    if (consoleCmd.Length > 0)
+                    {
+                        Console.Write(" ");
+                        Console.Write("\b");
+                        consoleCmd = consoleCmd.Substring(0, consoleCmd.Length - 1);
+                    }
 
 				} 
 				else 
@@ -257,8 +260,11 @@ namespace peer
 					{
 					case ENTERKEY:    //this is '\n' on unix.  it's only on Windows that it's \r
 						//parse the command and execute the command
-						executeConsoleCommand(consoleCmd);
-						consoleCmd = "";
+                            if (consoleCmd != "")
+                            {
+                                executeConsoleCommand(consoleCmd);
+                                consoleCmd = "";
+                            }
 						break;
 
 					default:
@@ -303,7 +309,8 @@ namespace peer
 							return;
 						}
 					}
-					Console.WriteLine("got a get for file: " + cmdParts[1] + "\n");
+
+					Console.WriteLine("Received a get for file: " + cmdParts[1] + "\n");
                     socketSrv.commandMessage cmdGetMsg = new socketSrv.commandMessage();
                     cmdGetMsg.command = 2;
                     cmdGetMsg.fileName = cmdParts[1];

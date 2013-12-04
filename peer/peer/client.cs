@@ -143,6 +143,7 @@ namespace socketSrv
                     cmd.srcIP = IPAddress.Parse(address);
 					Console.WriteLine("in client process. Command is {0} and srcIP is {1}", cmd.command, cmd.srcIP); 
 					clientQueue.Add(cmd);
+                    //Program.p2p.clientProcessedQueue.Add(cmd);
 				}
 			}
 				
@@ -294,7 +295,7 @@ namespace socketSrv
 			DateTime now = DateTime.Now;
 			clientTimer.Stop ();
 			//find server messages older than 1 minute
-			for (int i = Program.p2p.serverProcessedQueue.Count-1; i > 0; i--) {
+			for (int i = Program.p2p.serverProcessedQueue.Count-1; i >= 0; i--) {
 				if (Program.p2p.serverProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
 					Program.p2p.serverProcessedQueue.RemoveAt (i);
 				}

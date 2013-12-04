@@ -599,7 +599,7 @@ namespace socketSrv
 			DateTime now = DateTime.Now;
 			serverTimer.Stop ();
 			//find server messages older than 1 minute
-			for (int i = Program.p2p.clientProcessedQueue.Count-1; i > 0; i--) {
+			for (int i = Program.p2p.clientProcessedQueue.Count-1; i >= 0; i--) {
 				if (Program.p2p.clientProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
 					Program.p2p.clientProcessedQueue.RemoveAt (i);
 				}
