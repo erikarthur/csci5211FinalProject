@@ -274,7 +274,7 @@ namespace socketSrv
                 //if (cmd.srcIP.Address.ToString() == "0.0.0.0")
                 cmd.srcIP = Program.p2p.myAddress;
 
-                if (cmd.srcIP.Address != cmd.peerIP.Address)
+                if ((cmd.srcIP.Address != cmd.peerIP.Address) || (clientQueue.Count == 0))
                 {
                     clientStream.Write(buffer, 0, msgLen);
                     Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
