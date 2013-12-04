@@ -390,9 +390,9 @@ namespace peer
                         
                         cmdPutMsg.peerIP = Program.p2p.myAddress; 
                         cmdPutMsg.port = 8001 + RNG.Next(2999);
-						
 
-                        cmdPutMsg.fileName = myFiles[putFileIndex].FullName;
+
+                        cmdPutMsg.fileName = cmdParts[1];
                         
                         IPHostEntry tempIP = Dns.GetHostEntry(cmdParts[2]);
                         cmdPutMsg.putIP = tempIP.AddressList[0];

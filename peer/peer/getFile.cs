@@ -327,14 +327,15 @@ namespace peer
             byte[] buffer = new byte[1500];
             int fileSize, fileNameSize, bufCnt;
             string fileName;
+            string fullFilename;
 
-            fileName = Program.p2p.getFileDir() + cmd.fileName;
+            fullFilename = Program.p2p.getFileDir() + cmd.fileName;
 
-            FileInfo fi1 = new FileInfo(fileName);
+            FileInfo fi1 = new FileInfo(fullFilename);
             if (fi1.Exists)
             {
                 fileSize = (int)fi1.Length;
-                //fileName = fi1.Name;
+                fileName = fi1.Name;
                 fileNameSize = fileName.Length;
             }
             else
@@ -381,7 +382,7 @@ namespace peer
             System.Buffer.BlockCopy(fileNameBytes, 0, buffer, bufCnt, fileNameSize);
             bufCnt += fileNameSize;
             int totalByteCnt = bufCnt;
-            using (BinaryReader fs = new BinaryReader(File.Open(fileName, FileMode.Open)))
+            using (BinaryReader fs = new BinaryReader(File.Open(fullFilename, FileMode.Open)))
             {
                 int readCnt = fs.Read(buffer, bufCnt, buffer.Length - bufCnt);
                 messageSizeBytes = BitConverter.GetBytes(bufCnt);
