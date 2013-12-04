@@ -223,18 +223,9 @@ namespace peer
         public void receivePutFile(object data)
         {
             socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
-            IPEndPoint iep = new IPEndPoint(IPAddress.Any, cmd.port);
-            Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
-            sock.Bind((EndPoint)iep);
-            sock.Listen(1);
-
-            //ioTimeout.Elapsed += ioTimeout_Elapsed;
-            //ioTimeout.Interval = 27000;
-            //ioTimeout.Start();
-
-            Socket incomingConn = sock.Accept();
-
-   
+            IPEndPoint iep = new IPEndPoint(cmd.peerIP, cmd.port);
+            Socket incomingConn = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            incomingConn.Connect(iep);
 
             byte[] buffer = new byte[1500];
 
