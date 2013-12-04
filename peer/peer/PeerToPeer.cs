@@ -233,9 +233,9 @@ namespace peer
 
     						break;
 				case 3:  //put file
-                       
+                       //need to check my put IP against my IP.
 						int pfileIndex = fileLocal(msg.fileName);
-						if (pfileIndex != int.MaxValue)
+						if ((pfileIndex == int.MaxValue) && (msg.putIP.Address == this.myAddress.Address))
 						    {
                                 fileTransport g2 = new fileTransport();
                                 Thread t2 = new Thread(g2.receivePutFile);
