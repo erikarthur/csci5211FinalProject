@@ -278,11 +278,19 @@ namespace socketSrv
 
                     System.Buffer.BlockCopy(fileNameBytes, 0, buffer, byteCnt, fileNameLen);
                     byteCnt += fileNameLen;
-
-                    srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
-                    System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
-                    byteCnt += srcIpBytes.Length;
-
+					if (cmd.command == 2)
+					{
+	                    srcIpBytes = Program.p2p.myAddress.GetAddressBytes();
+	                    System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
+	                    byteCnt += srcIpBytes.Length;
+					}
+					else if (cmd.command == 3)
+					{
+						srcIpBytes = cmd.putIP.GetAddressBytes();
+	                    System.Buffer.BlockCopy(srcIpBytes, 0, buffer, byteCnt, srcIpBytes.Length);
+	                    byteCnt += srcIpBytes.Length;	
+					}
+	
                     int msgLen = byteCnt;
                     msgLenBytes = BitConverter.GetBytes(msgLen);
                     System.Buffer.BlockCopy(msgLenBytes, 0, buffer, 0, msgLenBytes.Length);

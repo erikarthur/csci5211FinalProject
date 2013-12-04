@@ -1,5 +1,5 @@
 ﻿
-#define WINDOWS   //comment out for linux or unix
+#undef WINDOWS   //comment out for linux or unix
 
 
 using socketSrv;
@@ -15,6 +15,17 @@ using peer;
 using ServerExperiment;
 
 namespace peer
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 {
     class PeerToPeer
     {
@@ -116,6 +127,29 @@ namespace peer
 
             }
             else
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
             {
 				//first machine don't need a client instance
                 Console.WriteLine("First machine in network.");
