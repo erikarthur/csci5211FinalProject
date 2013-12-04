@@ -1,5 +1,5 @@
 ﻿
-#undef WINDOWS   //comment out for linux or unix
+#define WINDOWS   //comment out for linux or unix
 
 
 using socketSrv;
@@ -52,7 +52,7 @@ namespace peer
 
             string hostname = Dns.GetHostName();
             IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
-
+            IPAddress den = IPAddress.Parse("192.168.1.215");
             myAddress = IPAddress.Parse("0.0.0.0");
 
             byte[] networkBytes = new byte[4];
@@ -76,6 +76,8 @@ namespace peer
                             sb.Append(".");
                             sb.Append(networkBytes[3]);
                             myAddress = IPAddress.Parse(sb.ToString());
+                            if (myAddress.Address == den.Address)
+                                break;  //just for my windows machine with multiple NICS in use.
                         }
                     }
                 }
