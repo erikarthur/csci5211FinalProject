@@ -241,7 +241,7 @@ namespace socketSrv
 
                     Console.WriteLine("\nSent request to server machine");
 
-				    clientTimer.Interval = 35000;
+				    clientTimer.Interval = 5000;
 				    clientTimer.Start ();
 
                     //int basicCmdLen = 16;

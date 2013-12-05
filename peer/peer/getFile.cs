@@ -28,7 +28,7 @@ namespace peer
 			server.Start();
 
             ioTimeout.Elapsed += ioTimeout_Elapsed;
-            ioTimeout.Interval = 7000;
+            ioTimeout.Interval = 5000;
             ioTimeout.Start();
             
             tcpFileNetClient = new TcpClient();
