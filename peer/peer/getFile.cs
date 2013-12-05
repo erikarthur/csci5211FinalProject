@@ -35,8 +35,8 @@ namespace peer
             
             tcpFileNetClient = server.AcceptTcpClient();
 			
-			IPAddress remoteMachine = IPAddress.Parse(tcpFileNetClient.Client.RemoteEndPoint.ToString());	
-			Console.WriteLine("\n{0} Connected.  Starting file transfer\n", remoteMachine);
+			//IPAddress remoteMachine = IPAddress.Parse(tcpFileNetClient.Client.RemoteEndPoint.ToString());	
+			//Console.WriteLine("\n{0} Connected.  Starting file transfer\n", remoteMachine);
 			
 			byte [] buffer = new byte[1500];
 			
