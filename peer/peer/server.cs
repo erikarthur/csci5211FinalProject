@@ -125,6 +125,7 @@ namespace socketSrv
             StartAccept(null);
 
             Console.WriteLine("Starting server for p2p network on port {0}\n", localEndPoint.Port);
+			Program.p2p.numClients++;
             
         }
 
@@ -499,6 +500,7 @@ namespace socketSrv
             // Free the SocketAsyncEventArg so they can be reused by another client
             bufferManager.freeBuffer(e);
             asyncSocketStack.Push(e);
+			Program.p2p.numClients--;
         }
 		
 		public void SendCmd(commandMessage cmd)
