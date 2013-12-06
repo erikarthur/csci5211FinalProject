@@ -557,7 +557,7 @@ namespace peer
             bytesRead = -99;
             bytesRead = clientStream.Read(buffer, 0, 4096);
 
-            byte[] message = new byte[4092];
+			//byte[] message = new byte[4092];
             byte[] messageLength = new byte[4];
             int messageBytes = 0;
 

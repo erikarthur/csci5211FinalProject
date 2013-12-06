@@ -117,7 +117,7 @@ namespace peer
 		
 		public void sendFile (object data)
 		{
-			Console.WriteLine("in file transport - send file");
+			//Console.WriteLine("in file transport - send file");
 			
 			socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
 			
@@ -239,7 +239,7 @@ namespace peer
             byte[] fileSizeBytes = new byte[4];
             byte[] fileNameSizeBytes = new byte[4];
 
-            int messageSize, fileSize, fileNameSize, cmdNum;
+			int messageSize, fileSize, fileNameSize, cmdNum;
             string fileName;
 
             System.Buffer.BlockCopy(buffer, 0, messageSizeBytes, 0, 4);
@@ -294,29 +294,14 @@ namespace peer
 
         public void sendPutFile(object data)
         {
-            //send from the peer that got the put cmd on the console from the user.
-
-            //socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
-            //IPEndPoint iep = new IPEndPoint(cmd.putIP, cmd.port);
-            //TcpListener server = new TcpListener(iep);
-            //server.ExclusiveAddressUse = true;
-            //server.Start();
             socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
             IPEndPoint iep = new IPEndPoint(cmd.peerIP, cmd.port);
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sock.Bind(iep);
             sock.Listen(10);
 
-            //ioTimeout.Elapsed += ioTimeout_Elapsed;
-            //ioTimeout.Interval = 27000;
-            //ioTimeout.Start();
-
             Socket incomingConn = sock.Accept();
-            
-
-            //IPAddress remoteMachine = IPAddress.Parse(tcpFileNetClient.Client.RemoteEndPoint.ToString());
-            //Console.WriteLine("\n{0} Connected.  Starting file transfer\n", remoteMachine);
-
+ 
             byte[] messageSizeBytes = new byte[4];
             byte[] addressBytes = new byte[4];
             byte[] portBytes = new byte[4];

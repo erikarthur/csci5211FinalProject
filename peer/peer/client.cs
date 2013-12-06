@@ -79,10 +79,8 @@ namespace socketSrv
                 byte[] srcIpBytes = new byte[4];
 				
 			
-				int messageSize, fileSize, fileNameSize, cmdNum, byteCnt;
-				IPAddress cmdIP;
-				string fileName;
-				
+				int messageSize, fileSize, fileNameSize, byteCnt;
+
 				//gotta process the data
 				int bytesRead = clientStream.Read(buffer,0,bufSize);
 				if (bytesRead > 0)
@@ -147,7 +145,7 @@ namespace socketSrv
                     if (cmd.command == 3)
                         cmd.putIP = IPAddress.Parse(address);
 
-					Console.WriteLine("in client process. Command is {0} and srcIP is {1}", cmd.command, cmd.srcIP); 
+					//Console.WriteLine("in client process. Command is {0} and srcIP is {1}", cmd.command, cmd.srcIP); 
 					clientQueue.Add(cmd);
                     //Program.p2p.clientProcessedQueue.Add(cmd);
 				}
@@ -161,55 +159,7 @@ namespace socketSrv
         {
             IPHostEntry serverIP = Dns.GetHostEntry(myServer.peerIP.ToString());
             tcpClient = new TcpClient(serverIP.HostName, myServer.peerPort);
-
             clientStream = tcpClient.GetStream();
-
-            //Int32 messageID = 1;   //add client
-            //int clientMsgStreamLength = (int)(4 * sizeof(Int32));
-            //byte[] buffer = new byte[4096];
-
-            //byte[] intBytes = BitConverter.GetBytes(clientMsgStreamLength);
-            //byte[] addressBytes = ServerExperiment.Program.myAddress.GetAddressBytes();
-            //byte[] portBytes = BitConverter.GetBytes(ServerExperiment.Program.myPort);
-            //byte[] messageBytes = BitConverter.GetBytes(messageID);
-
-            //System.Buffer.BlockCopy(intBytes, 0, buffer, 0, intBytes.Length);  //prepends length to buffer
-            //System.Buffer.BlockCopy(addressBytes, 0, buffer, 4, addressBytes.Length);
-            //System.Buffer.BlockCopy(portBytes, 0, buffer, 8, portBytes.Length);
-            //System.Buffer.BlockCopy(messageBytes, 0, buffer, 12, messageBytes.Length);
-
-            //clientStream.Write(buffer, 0, clientMsgStreamLength);
-            //clientStream.Flush();
-
-            ////wait for ACK from server
-            //int bytesRead = clientStream.Read(buffer, 0, 4096);
-
-            //byte[] message = new byte[4092];
-            //byte[] messageLength = new byte[4];
-            //int numMessageBytes = 0;
-            //int nextMsgBytesRead = 0;
-
-            //if (bytesRead > 3)
-            //{
-            //    //strip off first 4 bytes and get the message length
-            //    System.Buffer.BlockCopy(buffer, 0, messageLength, 0, sizeof(Int32));
-            //    numMessageBytes = BitConverter.ToInt32(messageLength, 0);
-            //}
-
-            //while (bytesRead < numMessageBytes)
-            //{
-            //    nextMsgBytesRead = clientStream.Read(buffer, bytesRead, 4096 - bytesRead);
-            //    bytesRead += nextMsgBytesRead;
-
-            //    //bugbug - need a watchdog timer for timeouts
-            //    //bugbug - need to handle the case of more data than expected from the network
-            //}
-
-
-            //byte[] ackMessage = new byte[4];
-            //int ackNum = -99;
-            //System.Buffer.BlockCopy(buffer, 4, ackMessage, 0, 4);
-            //ackNum = BitConverter.ToInt32(ackMessage, 0);
         }
 
         public void SendCmd (socketSrv.commandMessage cmd)
@@ -248,12 +198,10 @@ namespace socketSrv
                     int byteCnt = 4;
 
 				    cmdBytes = BitConverter.GetBytes(cmd.command);
-                    //msgLenBytes = BitConverter.GetBytes(basicCmdLen);
+
 				    addressBytes = cmd.peerIP.GetAddressBytes();
 				    portBytes = BitConverter.GetBytes(cmd.port);
-                    //System.Buffer.BlockCopy(msgLenBytes, 0, buffer, byteCnt, msgLenBytes.Length);
-                    //byteCnt += msgLenBytes.Length;
-
+ 
                     System.Buffer.BlockCopy(addressBytes, 0, buffer, byteCnt, addressBytes.Length);
                     byteCnt += addressBytes.Length;
 
@@ -301,7 +249,7 @@ namespace socketSrv
                     if ((cmd.srcIP.Address != cmd.peerIP.Address) || (Program.p2p.serverProcessedQueue.Count == 0))
                     {
                         clientStream.Write(buffer, 0, msgLen);
-                        Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
+				        //Console.WriteLine("sent a message of {0} bytes asking for file", msgLen);
                     }
                     //add command to serverProcessedQueue
                     Program.p2p.serverProcessedQueue.Add(cmd);
@@ -322,7 +270,7 @@ namespace socketSrv
 			//find server messages older than 1 minute
 			for (int i = Program.p2p.serverProcessedQueue.Count-1; i >= 0; i--) {
 				if (Program.p2p.serverProcessedQueue [i].timeStamp.AddMinutes (1) >= now) {
-                    Console.WriteLine("{0} file not received socket timed out.", Program.p2p.serverProcessedQueue[i].fileName);
+					//Console.WriteLine("{0} file not received socket timed out.", Program.p2p.serverProcessedQueue[i].fileName);
 					Program.p2p.serverProcessedQueue.RemoveAt (i);
 				}
 			}
