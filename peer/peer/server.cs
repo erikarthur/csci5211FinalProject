@@ -425,6 +425,14 @@ namespace socketSrv
                             t2.Start(msg);
                         }
                     }
+                    else
+                    {
+
+                        msg.srcIP = Program.p2p.myAddress;
+
+                        //Console.WriteLine("in server process. Command is {0}. peer ip is {2} and srcIP is {1}", msg.command, msg.srcIP, msg.peerIP);
+                        Program.p2p.clientQueue.Add(msg);
+                    }
                     break;
             }
 
