@@ -101,6 +101,9 @@ namespace peer
 			clientInstance = connectToCentralServer(args[0], myAddress, myPort);
 			
 			fileDir = args[1];
+			if (!fileDir.EndsWith("/"))
+				fileDir = fileDir + "/";
+
 			refreshFileList(fileDir);
 			
             //make connection
