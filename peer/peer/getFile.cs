@@ -17,24 +17,28 @@ namespace peer
 
         public Socket incomingConn;
         public Socket outgoingConn;
+        public TcpListener serverConn;
+        public int mode = 0;
 
 		public void getFile (object data)
 		{
             //Console.WriteLine("in fileTransport - get file");
 			socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
 			IPEndPoint iep = new IPEndPoint(IPAddress.Any, cmd.port);
-			TcpListener server = new TcpListener(iep);
-			server.ExclusiveAddressUse = true;
-			server.Start();
+			serverConn = new TcpListener(iep);
+			serverConn.ExclusiveAddressUse = true;
+            mode = 1;
 
             ioTimeout.Elapsed += ioTimeout_Elapsed;
             ioTimeout.Interval = 5000;
             ioTimeout.Start();
+
+			serverConn.Start();
             
             tcpFileNetClient = new TcpClient();
             
-            tcpFileNetClient = server.AcceptTcpClient();
-			
+            tcpFileNetClient = serverConn.AcceptTcpClient();
+            ioTimeout.Stop();
 			//IPAddress remoteMachine = IPAddress.Parse(tcpFileNetClient.Client.RemoteEndPoint.ToString());	
 			//Console.WriteLine("\n{0} Connected.  Starting file transfer\n", remoteMachine);
 			
@@ -103,16 +107,24 @@ namespace peer
         void ioTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             ioTimeout.Stop();
-            if (incomingConn != null)
+            Console.WriteLine("No Peer connection made for file transfer.  Port closed");
+            if (incomingConn != null) 
             {
                 if (!incomingConn.Connected)
                 {
                     incomingConn.Shutdown(SocketShutdown.Both);
                     fileNetStream.Close();
                     incomingConn.Close();
-                    Console.WriteLine("No Peer connection made for file transfer.  Port closed");
+                   
                 }
             }
+            if (mode == 2)
+            {
+                //serverConn.Stop();
+                serverConn = null;
+            }
+
+            mode = 0;
         }
 		
 		public void sendFile (object data)
@@ -297,11 +309,17 @@ namespace peer
             socketSrv.commandMessage cmd = (socketSrv.commandMessage)data;
             IPEndPoint iep = new IPEndPoint(cmd.peerIP, cmd.port);
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            mode = 2;
+
+            ioTimeout.Elapsed += ioTimeout_Elapsed;
+            ioTimeout.Interval = 5000;
+            ioTimeout.Start();
+
             sock.Bind(iep);
             sock.Listen(10);
 
             Socket incomingConn = sock.Accept();
- 
+            ioTimeout.Stop();
             byte[] messageSizeBytes = new byte[4];
             byte[] addressBytes = new byte[4];
             byte[] portBytes = new byte[4];
