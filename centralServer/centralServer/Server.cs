@@ -22,6 +22,8 @@ namespace CentralServer
         Semaphore maxNumberAcceptedClients;
         public List<peerInstance> peerList;
 		public List<networkLinks> peerConnections = new List<networkLinks>();
+		List<IPEndPoint> ipInUse = new List<IPEndPoint>();
+		public List<SocketAsyncEventArgs> myAsyncList = new List<SocketAsyncEventArgs>();
 
         public Server(int numConns, int receiveSize)
         {
@@ -115,11 +117,12 @@ namespace CentralServer
 
             SocketAsyncEventArgs socketEventArgs = asyncSocketStack.Pop();
             ((AsyncUserToken)socketEventArgs.UserToken).Socket = e.AcceptSocket;
-  
+  			myAsyncList.Add(socketEventArgs);
 
             bool willRaiseEvent = e.AcceptSocket.ReceiveAsync(socketEventArgs);
 
             IPEndPoint iep = (IPEndPoint)e.AcceptSocket.RemoteEndPoint;
+			ipInUse.Add(iep);
             //Console.WriteLine("New Peer is {0}", iep.Address);
 
             if (!willRaiseEvent)
@@ -351,13 +354,54 @@ namespace CentralServer
         {
             AsyncUserToken token = e.UserToken as AsyncUserToken;
 
-            IPEndPoint iep = (IPEndPoint)token.Socket.RemoteEndPoint;
+            //IPEndPoint iep = (IPEndPoint)token.Socket.RemoteEndPoint;
+			
+			List<IPEndPoint> validIP = new List<IPEndPoint>();
+			
+			for (int i=0; i < myAsyncList.Count; i++)
+			{
+				if (myAsyncList[i].RemoteEndPoint != null)
+				{
+					
+					validIP.Add((IPEndPoint)myAsyncList[i].RemoteEndPoint);
+				}
+			}
+			List<peerInstance> tempPeers = new List<peerInstance>();
+			tempPeers = peerList;
+			
+			if (tempPeers.Count == 1)
+			{
+				peerList.Clear();
+			}
+			else
+			{
+				for (int k=validIP.Count-1; k>=0; k--)
+				{
+					for (int j=0; j<tempPeers.Count; j++)
+					{
+						byte[] ip1 = tempPeers[j].peerIP.GetAddressBytes();
+						byte[] ip2 = validIP[k].Address.GetAddressBytes();
+						if (ip1 == ip2)	
+						{
+							tempPeers.RemoveAt(j);
+						}
+					}
+				}
+			}
+			byte[] peerAddressBytes = new byte[4];
+			byte[] removedIP = new byte[4];
+			
+			if (tempPeers.Count != 0)
+			{
+				removedIP = tempPeers[0].peerIP.GetAddressBytes();
+			}
             //token.m_socket.RemoteEndPoint.Address  & token.m_socket.RemoteEndPoint.Port is what need to be removed from peerList 
             for (int i = 0; i < peerList.Count;i++ )
             {
-                if (peerList[i].peerIP == iep.Address) 
+				peerAddressBytes = peerList[i].peerIP.GetAddressBytes();
+                if (peerAddressBytes == removedIP) 
                 {
-                    Console.WriteLine("Peer {0} has quit", iep.Address);
+                    Console.WriteLine("Peer has quit");
                     peerList.RemoveAt(i);
                 }
             }
@@ -375,6 +419,7 @@ namespace CentralServer
             Interlocked.Decrement(ref numConnectedSockets);
             maxNumberAcceptedClients.Release();
             Console.WriteLine("There are {0} clients connected to the server", numConnectedSockets);
+			printConnectionTable();
 
             // Free the SocketAsyncEventArg so they can be reused by another client
             //bufferManager.freeBuffer(e);

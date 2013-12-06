@@ -36,9 +36,6 @@ namespace CentralServer
             
             localEndPoint = new IPEndPoint(IPAddress.Any, port);      
 
-            //Console.WriteLine("Press any key to start the server ...");
-            //Console.ReadKey();
-
             // Start the central server listening for incoming connection requests
             using (Server server = new Server(numConnections, receiveSize))
             {
