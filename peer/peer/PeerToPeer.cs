@@ -219,7 +219,7 @@ namespace peer
                                 { //server = 0, client = 1
 							        if (clientSent) 
                                     {
-								        if (c != null) 
+									if ((c != null) && (numClients > 0))
 									        c.SendCmd (msg);
 
 								        s.SendCmd (msg);  
@@ -230,7 +230,8 @@ namespace peer
 							        if (serverSent) 
                                     {
 								        s.SendCmd (msg);
-								        if (c != null)
+									
+									if ((c != null) && (numClients > 0))
 									        c.SendCmd (msg);
 							        }
 						        }
