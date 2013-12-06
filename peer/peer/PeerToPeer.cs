@@ -98,9 +98,9 @@ namespace peer
  
 			//connect to central server and get P2P server info            
             peerInstance clientInstance = new peerInstance();            
-			clientInstance = connectToCentralServer(args[0], myAddress, myPort);
+			clientInstance = connectToCentralServer(args[1], myAddress, myPort);
 			
-			fileDir = args[1];
+			fileDir = args[0];
 			if (!fileDir.EndsWith("/"))
 				fileDir = fileDir + "/";
 

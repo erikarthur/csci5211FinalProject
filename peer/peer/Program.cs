@@ -18,6 +18,10 @@ namespace ServerExperiment
         
         static void Main(string[] args)
         {
+			if (args.Length != 2) {
+				Console.WriteLine ("Usage:  peer /directory/to/share centralserver\n");
+				Environment.Exit (0);
+			}
             p2p = new PeerToPeer();
             p2p.connectCentralServer(args);
             p2p.runP2PNetwork();
