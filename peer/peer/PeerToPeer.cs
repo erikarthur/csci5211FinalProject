@@ -40,6 +40,8 @@ namespace peer
 
 		public List<commandMessage> serverProcessedQueue = new List<commandMessage>();
 		public List<commandMessage> clientProcessedQueue = new List<commandMessage>();
+
+		public int numClients = 0;
  
         #if (WINDOWS)
             const char ENTERKEY = '\r';
