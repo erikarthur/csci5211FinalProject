@@ -4,7 +4,7 @@ using System.Text;
 using System.Net.Sockets;
 
 namespace socketSrv
-{
+{ 
 
     /// <summary>
     /// This class is designed for use as the object to be assigned to the SocketAsyncEventArgs.UserToken property. 
