@@ -402,8 +402,14 @@ namespace peer
 
 
                         cmdPutMsg.fileName = cmdParts[1];
-                        
-                        IPHostEntry tempIP = Dns.GetHostEntry(cmdParts[2]);
+
+                        IPHostEntry tempIP = new IPHostEntry();
+
+                        try { tempIP = Dns.GetHostEntry(cmdParts[2]); }
+                        catch (Exception) { 
+                            Console.WriteLine("Couldn't get IP address for host.  Cancelling share cmd.");
+                            return;
+                        }
                         cmdPutMsg.putIP = tempIP.AddressList[0];
                         
                         cmdPutMsg.timeStamp = DateTime.Now;
