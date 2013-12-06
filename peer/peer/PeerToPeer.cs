@@ -381,14 +381,14 @@ namespace peer
 				}
 				break;
 				
-			case "PUT":
+			case "SHARE":
 				if (cmdParts.Length != 3)
 				{
-					Console.WriteLine("Syntax Error:\nUsage:\nput filename machine\n");
+					Console.WriteLine("Syntax Error:\nUsage:\nshare filename machine\n");
 				}
 				else
 				{
-					Console.WriteLine("Sending out a put for file: " + cmdParts[1] + "\n");
+					Console.WriteLine("Sending out a share for file: " + cmdParts[1] + "\n");
 
                     socketSrv.commandMessage cmdPutMsg = new socketSrv.commandMessage();
 
@@ -410,7 +410,7 @@ namespace peer
                         
                         fileTransport g2 = new fileTransport();
                         Thread t2 = new Thread(g2.sendPutFile);
-						Console.WriteLine("Opened the socket to put the file");
+						Console.WriteLine("Opened the socket to share the file");
                         t2.Start(cmdPutMsg);
 
                         cmdPutMsg.fileName = cmdParts[1];
